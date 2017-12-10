@@ -1,0 +1,15 @@
+div.text-center {
+	color: red;
+}
+
+#chat-label {
+	font-size: 25px;
+}
+
+#chat-btn {
+	margin-top: 1.5%;
+}
+
+#name-submit {
+	margin-left: 2%;
+}

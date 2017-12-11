@@ -14,11 +14,12 @@ var config = {
 firebase.initializeApp(config);
      
 var database = firebase.database();
+var user;
 var player1;
 var player2;
-var rock = $('#rock').on('click', function(){});
-var paper = $('#paper').on('click', function(){});;
-var scissors = $('#scissors').on('click', function(){});;
+var rock = $('#rock')
+var paper = $('#paper')
+var scissors = $('#scissors')
 var name = '';
 var player1wins = 0;
 var player2wins = 0;
@@ -27,55 +28,32 @@ var player2losses = 0;
 
 $('#name-submit').on('click', function(){
 	name = $('#player-name').val().trim();
-	console.log(name);
 
 	database.ref().push({
-		name: name,
-		win: wins,
-		loss: losses,
-		dateAdded: firebase.database.ServerValue.TIMESTAMP
-	});
+				name: name,
+				dateAdded: firebase.database.ServerValue.TIMESTAMP
+			})
+	
 });
 
-database.ref().on('child_added', function(snapshot){
-	$('#player1-name').html('<td>' + snapshot.val().name + '</td>');
+// database.ref().on('child_added', function(snapshot){
+// 	$('#player1-name').html('<h2>' + snapshot.val().name + '</h2>');
+// 	$('#player2-name').html('<h2>' + snapshot.val().name + '</h2>');
+// })
+
+database.ref().orderByChild('name').limitToFirst(2).on('child_added', function(snapshot){
+	player1 = snapshot.key;
+	player2 = snapshot.key;
+	console.log(player1);
+	console.log(player2);
+	// $('#player1-name').html(snapshot.val().name);	
 })
 
-if (player1 == player2){
-	alert("It's a tie!");
-}
-
-else if (player1 == rock && player2 == scissors){
-	alert("player 1 wins!");
-	player1wins++;
-	player2losses++;
-}
-else if (player1 == paper && player2 == scissors){
-	alert("player 2 wins!");
-	player2wins++;
-	player1losses++;
-}
-else if (player1 == scissors && player2 == rock){
-	alert("player 2 wins!");
-	player2wins++;
-	player1losses++;
-}
-else if (player1 == scissors && player2 == paper){
-	alert("player 1 wins!");
-	player1wins++;
-	player2losses++;
-}
-else if (player1 == paper && player2 == rock){
-	alert("player 1 wins");
-	player1wins++;
-	player2losses++;
-}
-else if (player1 == rock && player2 == paper){
-	alert("player 2 wins");
-	player2wins++;
-	player1losses++;
-}
-
+// database.ref().orderByKey().limitToLast(1).on('child_added', function(snapshot){
+// 	player2 = snapshot.key;
+// 	console.log(player2)
+	// $('#player2-name').html(snapshot.val().name);	
+// })
 
 
 // look for .key(), this method takes the key from the database

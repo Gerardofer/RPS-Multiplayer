@@ -29,31 +29,29 @@ var player2losses = 0;
 $('#name-submit').on('click', function(){
 	name = $('#player-name').val().trim();
 
-	database.ref().push({
+	var newUser ={
 				name: name,
 				dateAdded: firebase.database.ServerValue.TIMESTAMP
-			})
-	
+				}
+	database.ref().push(newUser);
 });
 
-// database.ref().on('child_added', function(snapshot){
-// 	$('#player1-name').html('<h2>' + snapshot.val().name + '</h2>');
-// 	$('#player2-name').html('<h2>' + snapshot.val().name + '</h2>');
-// })
+database.ref().on('child_added', function(childSnapshot, prevChildKey){
 
-database.ref().orderByChild('name').limitToFirst(2).on('child_added', function(snapshot){
-	player1 = snapshot.key;
-	player2 = snapshot.key;
-	console.log(player1);
-	console.log(player2);
-	// $('#player1-name').html(snapshot.val().name);	
+
+	player1 = !prevChildKey;
+	player2 = prevChildKey;
+
+	if (player1){
+		$('#player1-name').html('<h2>' + childSnapshot.val().name + '</h2>');		
+	}
+	else if (player2){
+		$('#player2-name').html('<h2>' + childSnapshot.val().name + '</h2>');
+	}
 })
 
-// database.ref().orderByKey().limitToLast(1).on('child_added', function(snapshot){
-// 	player2 = snapshot.key;
-// 	console.log(player2)
-	// $('#player2-name').html(snapshot.val().name);	
-// })
+
+
 
 
 // look for .key(), this method takes the key from the database

@@ -12,43 +12,147 @@ var config = {
   };
 
 firebase.initializeApp(config);
+
      
 var database = firebase.database();
 var user;
-var player1;
-var player2;
+var secondPlayer;
+var playerOneChoice;
+var playerTwoChoice;
 var rock = $('#rock')
 var paper = $('#paper')
 var scissors = $('#scissors')
-var name = '';
+// var name = '';
 var player1wins = 0;
 var player2wins = 0;
 var player1losses = 0;
 var player2losses = 0;
+var firstName;
+var secondName;
 
-$('#name-submit').on('click', function(){
-	name = $('#player-name').val().trim();
 
-	var newUser ={
-				name: name,
-				dateAdded: firebase.database.ServerValue.TIMESTAMP
+$('#name-submit').on('click', function(event){
+	event.preventDefault();
+	var playerName = $('.player-name');
+	$('#playerSubmit').hide();
+	playerName.html($('#name').val().trim());
+	database.ref().once('value', function(snapshot){
+		if(snapshot.child("firstPlayer/firstName").exists()) {
+			secondPlayer = $('#name').val().trim()
+			database.ref("/secondPlayer").set({
+				secondName: secondPlayer
+			});
+			$('img').on('click', function(){
+				var gameImage = $(this).attr('data-info');
+				if (gameImage == 'rock'){
+					$('#alert-winner').html('<h3>Rock Selected</h3>')
+				}else if (gameImage == 'paper'){
+					$('#alert-winner').html('<h3>Paper Selected</h3>')
+				}else if (gameImage == 'scissors') {
+					$('#alert-winner').html('<h3>Scissors Selected</h3>')
 				}
-	database.ref().push(newUser);
-});
+				database.ref('/secondPlayer').push({
+				playerTwoChoice: gameImage
+				})
+			})
 
-database.ref().on('child_added', function(childSnapshot, prevChildKey){
+		}else {
+			firstPlayer = $('#name').val().trim();
+			database.ref("/firstPlayer").set({
+				firstName: firstPlayer
+			})
+			$('img').on('click', function(){
+				var gameImage = $(this).attr('data-info');
+				if (gameImage == 'rock'){
+					$('#alert-winner').html('<h3>Rock Selected</h3>')
+				}else if (gameImage == 'paper'){
+					$('#alert-winner').html('<h3>Paper Selected</h3>')
+				}else if (gameImage == 'scissors') {
+					$('#alert-winner').html('<h3>Scissors Selected</h3>')
+				}
+				database.ref('/firstPlayer').push({
+				playerOneChoice: gameImage
+				})
+			})
+		}
+	})
 
-
-	player1 = !prevChildKey;
-	player2 = prevChildKey;
-
-	if (player1){
-		$('#player1-name').html('<h2>' + childSnapshot.val().name + '</h2>');		
-	}
-	else if (player2){
-		$('#player2-name').html('<h2>' + childSnapshot.val().name + '</h2>');
-	}
+	
 })
+
+
+
+//---------------  THIS CODE WORKS   --------------------
+// $('#name-submit').on('click', function(event){
+// 	event.preventDefault();
+// 	name = $('#player-name').val().trim();
+
+// 	var newUser = {
+// 		name: name,
+// 		wins: 0,
+// 		loss: 0,
+// 		dateAdded: firebase.database.ServerValue.TIMESTAMP
+// 	}
+
+// 	database.ref().push(newUser);
+// });
+
+// database.ref().on('child_added', function(childSnapshot, prevChildKey){
+
+// 	player1 = !prevChildKey;
+// 	player2 = prevChildKey;
+
+// 	if (player1){
+// 		$('#player1-name').html('<h2>' + childSnapshot.val().name + '</h2>');
+// 		rock.on('click', function(){
+// 			console.log("rock!")
+// 			if (player1 == rock && player2 == scissors){
+// 				$('#alert-winner').html("<h1>Player 1 wins!</h1>");
+// 			}
+
+// 		})
+// 	}
+
+// 	if (player2){
+// 		$('#player2-name').html('<h2>' + childSnapshot.val().name + '</h2>');
+// 	}
+
+//------------------------------------------------------------------------------
+	// rock.on('click', function(){
+	// 	if (player1 == rock && player2 == rock){
+	// 		console.log("rock!")
+	// 		$('#alert-winner').html("<h1>It's a tie!</h1>");
+
+	// 	}
+	// 	else if (player1 == rock && player2 == scissors);
+	// 		$('#alert-winner').html("<h1>Player 1 wins!</h1>");
+	// 		console.log("hey!")
+	// })
+
+
+// var player = database.ref();
+
+// player.once('child_added')
+// .then(function(snapshot, prevChildKey){
+// 	var key = snapshot.key;
+// 	var childKey = prevChildKey;
+
+
+// 	console.log(key, childKey);
+
+// })
+
+
+
+
+
+
+
+
+
+
+
+// })
 
 
 

@@ -12,15 +12,11 @@
 <!-- User input form -->
 
 <div class="container text-center">
-	<form class="form-inline">
+	<form id="playerSubmit" class="form-inline">
 		<div class="form-group">
 		   	<label class="sr-only" for="player-name">Name</label>
-		    <input type="text" class="form-control" id="player-name" placeholder="Name">
+		    <input type="text" class="form-control" id="name" placeholder="Name">
 		</div>
-		<!-- <div class="form-group">
-		    <label class="sr-only" for="player-location">Location</label>
-		    <input type="text" class="form-control" id="player-location" placeholder="Location">
-		</div> -->
 		<button type="submit" id="name-submit" class="btn btn-default">Go!</button>
 	</form>
 </div>
@@ -29,7 +25,7 @@
 	<div class="row">
 		<div class="col s4">
 			<div>
-				<h2 id="player1-name">Player 1</h2>
+				<h2 class="player-name">Player 1</h2>
 				<table>
 			        <thead>
 			          <tr>
@@ -46,9 +42,12 @@
 			     </table>
 			</div>
 		</div>
-		<div class="col s4 offset-s4">
+		<div class="col s4">
+			<div id="alert-winner"></div>
+		</div>
+		<div class="col s4">
 			<div>
-				<h2 id="player2-name">Player 2</h2>
+				<h2 class="player-name">Player 2</h2>
 				<table>
 			        <thead>
 			          <tr>
@@ -72,9 +71,9 @@
 
 <div class="container">
 	<div class="carousel">
-	    <a class="carousel-item"><img id="rock" src="assets/images/rock.png"></a>
-	    <a class="carousel-item"><img id="paper" src="assets/images/paper.png"></a>
-	    <a class="carousel-item"><img id="scissors" src="assets/images/scissors.png"></a>
+	    <a class="carousel-item"><img id="rock" data-info="rock" src="assets/images/rock.png"></a>
+	    <a class="carousel-item"><img id="paper" data-info="paper" src="assets/images/paper.png"></a>
+	    <a class="carousel-item"><img id="scissors" data-info="scissors" src="assets/images/scissors.png"></a>
   	</div>
 </div>
 

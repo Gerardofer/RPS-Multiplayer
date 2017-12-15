@@ -13,3 +13,8 @@ div.text-center {
 #name-submit {
 	margin-left: 2%;
 }
+
+.choice-display {
+	width: 125px;
+	height: 125px;
+}

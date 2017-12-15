@@ -16,6 +16,9 @@ firebase.initializeApp(config);
      
 var database = firebase.database();
 var user;
+var RPS;
+var choice1;
+var choice2;
 var secondPlayer;
 var playerOneChoice;
 var playerTwoChoice;
@@ -127,27 +130,18 @@ var secondName;
 
 //------------------------------------------------------------------------------
 	
-	$('#name-submit').on('click', function(event){
-		event.preventDefault();
-		$('#playerSubmit').hide();
-		name = $('#name').val().trim();
+$('#name-submit').on('click', function(event){
+	event.preventDefault();
+	$('#playerSubmit').hide();
+	name = $('#name').val().trim();
 
-		var playerAdded = database.ref().push({
-					name: name,
-					wins: 0,
-					losses: 0,
-					selection:''
-					});
-		localStorage.setItem('playerId', playerAdded.key);
-	})
-
-
-
-
+	var playerAdded = database.ref('players').push({
+				name: name,
+				});
+	localStorage.setItem('playerId', playerAdded.key);
+})
 	
-database.ref().on('child_added', function(snapshot, prevChildKey){
-
-	console.log(snapshot.val().name + snapshot.key + " " + snapshot.val().selection);
+database.ref('players').on('child_added', function(snapshot, prevChildKey){
 	
 	player1 = !prevChildKey;
 	player2 = prevChildKey;
@@ -155,29 +149,69 @@ database.ref().on('child_added', function(snapshot, prevChildKey){
 	if (player1){
 		$('#first-player').html('<h2>' + snapshot.val().name + '</h2>');
 
-		$(document).on('click', '.carousel-item', function(){
-			console.log("Here I am!")
-			selection = $(this).data('info');
-			console.log(selection);
-			var playerId = localStorage.getItem('playerId');
-			console.log('this player just played', playerId);
-			if(selection == 'rock'){
-				$('#alert-winner').append('<h5>' + snapshot.val().selection + '</h5>')
-			}
-			
-		});
-	};	
-		
+	}
 	if (player2){
 		$('#second-player').html('<h2>' + snapshot.val().name + '</h2>');
-
-		// if (gameImage == 'rock'){
-		// 	$('#alert-winner').html('<h5>' + childSnapshot.val().choice + '</h5>')
-		// }else if (gameImage == 'paper'){
-		// 	$('#alert-winner').html('<h5>' + childSnapshot.val().choice + '</h5>')
-		// }else if (gameImage == 'scissors') {
-		// 	$('#alert-winner').html('<h5>' + childSnapshot.val().choice + '</h5>')
-		// }
-	};
+	}
 });
+
+
+$('.carousel').on('click', '.carousel-item', function(){
+
+	// var playerId = localStorage.getItem('playerId');
+	// console.log('this player just played', playerId);
+	RPS = $(this).attr('data-info');
+
+	var playerOneChoice = database.ref('choice').push({
+		playerChoice: RPS
+	})
+
+	database.ref('choice').on('child_added', function(snapshot, prevChildKey){
+
+		choice1 = !prevChildKey;
+		choice2 = prevChildKey;
+		var image = $('<img class="choice-display">');
+
+		if(choice1){
+
+			if (RPS === 'rock'){
+				image.attr('src', 'assets/images/rock.png');
+				$('#alert-winner1').html(image)
+			}
+			else if (RPS === 'paper'){
+				image.attr('src', 'assets/images/paper.png');	
+					$('#alert-winner1').html(image)
+			}
+			else if (RPS === 'scissors'){
+				image.attr('src', 'assets/images/scissors.png');		
+					$('#alert-winner1').html(image)
+			}
+		}
+
+		if(choice2){
+			if (RPS === 'rock'){
+			image.attr('src', 'assets/images/rock.png');
+				$('#alert-winner2').html(image);
+			}
+			else if (RPS === 'paper'){
+				image.attr('src', 'assets/images/paper.png');	
+					$('#alert-winner2').html(image);
+			}
+			else if (RPS === 'scissors'){
+				image.attr('src', 'assets/images/scissors.png');		
+					$('#alert-winner2').html(image);
+			}
+		}
+	})
+
+});
+
+
+
+
+		
+
+
+
+
 

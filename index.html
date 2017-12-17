@@ -25,7 +25,8 @@
 	<div class="row">
 		<div class="col s4">
 			<div>
-				<h2 id="first-player" class="player-name">Player 1</h2>
+				<h2 id="first-player" class="player-name" data-empty="Player 1">Player 1</h2>
+				<p id="first-player-selection" class="player-selection"></p>
 				<table>
 			        <thead>
 			          <tr>
@@ -35,14 +36,14 @@
 			        </thead>
 			        <tbody>
 			          <tr>
-			            <td id="player1-wins"></td>
-			            <td id="player1-losses"></td>
+			            <td id="player1-wins" class="player-stats"></td>
+			            <td id="player1-losses" class="player-stats"></td>
 			          </tr>
 			      	</tbody>
 			     </table>
 			     <div class="wrapper">
 					<div class="col s4">
-						<div class="alert-winner1">
+						<div class="alert-winner1 winner-alert">
 							
 						</div>
 					</div>
@@ -52,7 +53,8 @@
 		
 		<div class="col s4 offset-s4">
 			<div>
-				<h2 id="second-player" class="player-name">Player 2</h2>
+				<h2 id="second-player" class="player-name" data-empty="Player 1">Player 2</h2>
+				<p id="second-player-selection" class="player-selection"></p>
 				<table>
 			        <thead>
 			          <tr>
@@ -62,14 +64,14 @@
 			        </thead>
 			        <tbody>
 			          <tr>
-			            <td id="player1-wins"></td>
-			            <td id="player2-losses"></td>
+			            <td id="player2-wins" class="player-stats"></td>
+			            <td id="player2-losses" class="player-stats"></td>
 			          </tr>
 			      	</tbody>
 			    </table>
 			    <div class="wrapper">
 					<div class="col s4">
-						<div class="alert-winner2">
+						<div class="alert-winner2 winner-alert">
 					
 						</div>
 					</div>
@@ -79,6 +81,9 @@
 	</div>	
 </div>
 
+<div class="container">
+	<button id="newGame" class="btn btn-default playAgain">New Game</button>
+</div>
 <!-- Rock, Paper, Scissors functionality -->
 
 <div class="container">
@@ -97,6 +102,8 @@
 		<textarea id="chat-box" class="form-control" rows="1"></textarea>
 		<button id="chat-btn" class="btn btn-primary btn-lg">Send!</button>	
 	</form>
+	<br>
+	<button id="resetGame" class="btn btn-default">Reset Game</button>
 </div>
 	
 

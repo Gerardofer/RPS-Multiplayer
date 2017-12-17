@@ -21,6 +21,8 @@ var choice1;
 var choice2;
 var secondPlayer;
 var playerOneChoice;
+var playerOneId;
+var playerTwoId;
 var playerTwoChoice;
 var rock = $('#rock')
 var paper = $('#paper')
@@ -33,127 +35,78 @@ var player2losses = 0;
 var firstName;
 var secondName;
 
+// reset game for new players
+$("#resetGame").on('click', function() {
+	// empty DB
+	database.ref('/players').set({});
+	database.ref('/game').set({});
+});
 
-// $('#name-submit').on('click', function(event){
-// 	event.preventDefault();
-// 	var playerName = $('.player-name');
-// 	$('#playerSubmit').hide();
-// 	playerName.html($('#name').val().trim());
-// 	database.ref().once('value', function(snapshot){
-// 		if(snapshot.child("firstPlayer/firstName").exists()) {
-// 			secondPlayer = $('#name').val().trim()
-// 			database.ref("/secondPlayer").set({
-// 				secondName: secondPlayer
-// 			});
-// 			$('img').on('click', function(){
-// 				var gameImage = $(this).attr('data-info');
-// 				if (gameImage == 'rock'){
-// 					$('#alert-winner').html('<h5>Rock Selected</h5>')
-// 				}else if (gameImage == 'paper'){
-// 					$('#alert-winner').html('<h5>Paper Selected</h5>')
-// 				}else if (gameImage == 'scissors') {
-// 					$('#alert-winner').html('<h5>Scissors Selected</h5>')
-// 				}
-// 				database.ref('/secondPlayer').push({
-// 				playerTwoChoice: gameImage
-// 				})
-// 			})
+$("#newGame").on('click', function() {
+	database.ref('/game').set({});
+});
 
-// 		}else {
-// 			firstPlayer = $('#name').val().trim();
-// 			database.ref("/firstPlayer").set({
-// 				firstName: firstPlayer
-// 			})
-// 			$('img').on('click', function(){
-// 				var gameImage = $(this).attr('data-info');
-// 				if (gameImage == 'rock'){
-// 					$('#alert-winner').html('<h5>Rock Selected</5>')
-// 				}else if (gameImage == 'paper'){
-// 					$('#alert-winner').html('<h5>Paper Selected</h5>')
-// 				}else if (gameImage == 'scissors') {
-// 					$('#alert-winner').html('<h5>Scissors Selected</h5>')
-// 				}
-// 				database.ref('/firstPlayer').push({
-// 				playerOneChoice: gameImage
-// 				})
-// 			})
-// 		}
-// 	})
-// })
+database.ref('/game').on('child_removed', function() {
+	$('.playAgain').hide();
+	$('.winner-alert').html('');
+	$('.player-selection').html('');
+	$('.carousel-item').fadeIn();
+	playerOneChoice = null;
+	playerTwoChoice = null;
+});
 
-// database.ref().on('value', function(snapshot){
-// 	console.log(snapshot.val());
-// 	if (snapshot.child('/firstPlayer').exists()){
-// 		$('#first-player').text(snapshot.val().firstPlayer.firstName);
-// 	}
-// 	if (snapshot.child('/secondPlayer').exists()){
-// 		$('#second-player').text(snapshot.val().secondPlayer.secondName);
-// 	}
-// })
-
-
-
-//---------------  THIS CODE WORKS   --------------------
-// $('#name-submit').on('click', function(event){
-// 	event.preventDefault();
-// 	name = $('#player-name').val().trim();
-
-// 	var newUser = {
-// 		name: name,
-// 		wins: 0,
-// 		loss: 0,
-// 		dateAdded: firebase.database.ServerValue.TIMESTAMP
-// 	}
-
-// 	database.ref().push(newUser);
-// });
-
-// database.ref().on('child_added', function(childSnapshot, prevChildKey){
-
-// 	player1 = !prevChildKey;
-// 	player2 = prevChildKey;
-
-// 	if (player1){
-// 		$('#player1-name').html('<h2>' + childSnapshot.val().name + '</h2>');
-// 		rock.on('click', function(){
-// 			console.log("rock!")
-// 			if (player1 == rock && player2 == scissors){
-// 				$('#alert-winner').html("<h1>Player 1 wins!</h1>");
-// 			}
-
-// 		})
-// 	}
-
-// 	if (player2){
-// 		$('#player2-name').html('<h2>' + childSnapshot.val().name + '</h2>');
-// 	}
-
-//------------------------------------------------------------------------------
-	
 $('#name-submit').on('click', function(event){
 	event.preventDefault();
 	$('#playerSubmit').hide();
 	name = $('#name').val().trim();
 
-	var playerAdded = database.ref('players').push({
+	var playerAdded = database.ref('/players').push({
 				name: name,
+				wins: 0,
+				losses: 0
 				});
-	localStorage.setItem('playerId', playerAdded.key);
+	sessionStorage.setItem('playerId', playerAdded.key);
+})
+
+// reset the DOM when the game is reset
+database.ref('/players').on('child_removed', function(childSnapshot) {
+	// put Player 1 and Player 2 defaults on the dom and remove the DB key from the name
+	$("." + childSnapshot.key).html($("." + childSnapshot.key).data('empty')).removeClass("." + childSnapshot.key);
+	$('#playerSubmit').show();
+	sessionStorage.removeItem('playerId');
+	$('.playAgain').hide();
+	$('.carousel-item').fadeIn();
+	$('.player-selection').html('');
+	$('.winner-alert').html('');
+	$('.player-stats').html('');
 })
 	
-database.ref('players').on('child_added', function(snapshot, prevChildKey){
+database.ref('/players').on('child_added', function(snapshot, prevChildKey){
 	
 	player1 = !prevChildKey;
 	player2 = prevChildKey;
 
 	if (player1){
-		$('#first-player').html('<h2>' + snapshot.val().name + '</h2>');
-
+		$('#first-player').html(snapshot.val().name).addClass(snapshot.key);
+		$('#first-player-selection').addClass(snapshot.key + '_selection');
+		playerOneId = snapshot.key;
 	}
 	if (player2){
-		$('#second-player').html('<h2>' + snapshot.val().name + '</h2>');
+		$('#second-player').html(snapshot.val().name).addClass(snapshot.key);
+		$('#second-player-selection').addClass(snapshot.key + '_selection');
+		playerTwoId = snapshot.key;
 	}
 });
+
+database.ref('/players').on('child_changed', function(childSnapshot) {
+	if (childSnapshot.key === playerOneId) {
+		$('#player1-wins').text(childSnapshot.val().wins);
+		$('#player1-losses').text(childSnapshot.val().losses);
+	} else {
+		$('#player2-wins').text(childSnapshot.val().wins);
+		$('#player2-losses').text(childSnapshot.val().losses);
+	}
+})
 
 
 $('.carousel').on('click', '.carousel-item', function(){
@@ -162,56 +115,112 @@ $('.carousel').on('click', '.carousel-item', function(){
 	// console.log('this player just played', playerId);
 	RPS = $(this).attr('data-info');
 
-	var playerOneChoice = database.ref('choice').push({
-		playerChoice: RPS
-	})
-
-	database.ref('choice').on('child_added', function(snapshot, prevChildKey){
-
-		choice1 = !prevChildKey;
-		choice2 = prevChildKey;
-		var image = $('<img class="choice-display">');
-
-		if(choice1){
-
-			if (RPS === 'rock'){
-				image.attr('src', 'assets/images/rock.png');
-				$('#alert-winner1').html(image)
-			}
-			else if (RPS === 'paper'){
-				image.attr('src', 'assets/images/paper.png');	
-					$('#alert-winner1').html(image)
-			}
-			else if (RPS === 'scissors'){
-				image.attr('src', 'assets/images/scissors.png');		
-					$('#alert-winner1').html(image)
-			}
-		}
-
-		if(choice2){
-			if (RPS === 'rock'){
-			image.attr('src', 'assets/images/rock.png');
-				$('#alert-winner2').html(image);
-			}
-			else if (RPS === 'paper'){
-				image.attr('src', 'assets/images/paper.png');	
-					$('#alert-winner2').html(image);
-			}
-			else if (RPS === 'scissors'){
-				image.attr('src', 'assets/images/scissors.png');		
-					$('#alert-winner2').html(image);
-			}
-		}
-	})
-
+	database.ref('/game').push({
+		player: sessionStorage.getItem('playerId'),
+		choice: RPS
+	});
+	//$('.' + sessionStorage.getItem('playerId') + '_selection').html('Played ' + RPS);
+	// fadeout unplayed options
+	setTimeout(function() {
+		$('.carousel-item').not('.active').fadeOut();
+	}, 1000);
 });
 
+database.ref('/game').on('child_added', function(childSnapshot){
+	if ($('#first-player').hasClass(childSnapshot.val().player)) {
+		playerOneChoice = childSnapshot.val().choice
+	} else {
+		playerTwoChoice = childSnapshot.val().choice;
+	}
+	if (childSnapshot.val().player === sessionStorage.getItem('playerId')) {
+		$('.' + childSnapshot.val().player + '_selection').html('Played ' + childSnapshot.val().choice);
+	} else {
+		$('.' + childSnapshot.val().player + '_selection').html('Has played');
+	}
+	if (playerOneChoice && playerTwoChoice) {
+		$('.playAgain').show();
+	
+		if (playerOneChoice === playerTwoChoice) {
+			$('.alert-winner1').html('Tie!');
+			$('.alert-winner2').html('Tie!');
+		}
 
+		if (playerOneChoice === 'paper' && playerTwoChoice === 'rock') {
+			$('.alert-winner1').html('Win!');
+			$('.alert-winner2').html('Lose!');
+			player1wins++;
+			player2losses++;
+			database.ref('/players').child(playerOneId).update({
+				wins: player1wins
+			});
+			database.ref('/players').child(playerTwoId).update({
+				losses: player2losses
+			});
+		}
 
+		if (playerOneChoice === 'paper' && playerTwoChoice === 'scissors') {
+			$('.alert-winner1').html('Lose!');
+			$('.alert-winner2').html('Win!');
+			player1losses++;
+			player2wins++;
+			database.ref('/players').child(playerOneId).update({
+				losses: player1losses
+			});
+			database.ref('/players').child(playerTwoId).update({
+				wins: player2wins
+			});
+		}
 
-		
+		if (playerOneChoice === 'scissors' && playerTwoChoice === 'rock') {
+			$('.alert-winner1').html('Lose!');
+			$('.alert-winner2').html('Win!');
+			player1losses++;
+			player2wins++;
+			database.ref('/players').child(playerOneId).update({
+				losses: player1losses
+			});
+			database.ref('/players').child(playerTwoId).update({
+				wins: player2wins
+			});
+		}
 
+		if (playerOneChoice === 'scissors' && playerTwoChoice === 'paper') {
+			$('.alert-winner1').html('Win!');
+			$('.alert-winner2').html('Lose!');
+			player1wins++;
+			player2losses++;
+			database.ref('/players/').child(playerOneId).update({
+				wins: player1wins
+			});
+			database.ref('/players').child(playerTwoId).update({
+				losses: player2losses
+			});
+		}
 
+		if (playerOneChoice === 'rock' && playerTwoChoice === 'paper') {
+			$('.alert-winner1').html('Lose!');
+			$('.alert-winner2').html('Win!');
+			player1losses++;
+			player2wins++;
+			database.ref('/players').child(playerOneId).update({
+				losses: player1losses
+			});
+			database.ref('/players').child(playerTwoId).update({
+				wins: player2wins
+			});
+		}
 
-
-
+		if (playerOneChoice === 'rock' && playerTwoChoice === 'scissors') {
+			$('.alert-winner1').html('Win!');
+			$('.alert-winner2').html('Lose!');
+			player1wins++;
+			player2losses++;
+			database.ref('/players').child(playerOneId).update({
+				wins: player1wins
+			});
+			database.ref('/players').child(playerTwoId).update({
+				losses: player2losses
+			});
+		}
+	}
+});
